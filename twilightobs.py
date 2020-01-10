@@ -55,7 +55,7 @@ def twilightobs_select():
 
     #do query
     result = dbquery(query)
-    url = 'https://www.keck.hawaii.edu/software/db_api/telSchedule.php?cmd=getObserverInfo&obsid='
+    url = yaml.safe_load(open('config.live.ini'))['TelAPI']['url']
     for key, entry in enumerate(result):
         result[key]['PILastName'] = result[key]['PIFirstName'] = ''
         if entry['PiId'] == None: continue
