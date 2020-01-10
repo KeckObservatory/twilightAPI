@@ -52,10 +52,20 @@ def twilightobs_select():
                     query += f" and {paramname[i]} like '{p}'"
         query += ';'
 
-    print(query)
 
     #do query
     result = dbquery(query)
+    url = 'https://www.keck.hawaii.edu/software/db_api/telSchedule.php?cmd=getObserverInfo&obsid='
+    for key, entry in enumerate(result):
+        result[key]['PILastName'] = result[key]['PIFirstName'] = ''
+        if entry['PiId'] == None: continue
+        data = urllib.request.urlopen(url+str(entry['PiId']))
+        data = data.read().decode('utf8')
+        data = json.loads(data)
+        if data:
+            result[key]['PILastName'] = data['LastName']
+            result[key]['PIFirstName'] = data['FirstName']
+
     return json.dumps(result,default=jsonConverter)
 
 def verify_inputs(paramarray):
@@ -83,9 +93,10 @@ def twilightobs_insert():
     hash_cron = request.args.get('hash')
     hashacc = yaml.safe_load(open('config.live.ini'))['Hash']['account']
 
-    #get hash for accepted users only
+    #get hash for KCRON user only
+    #hash_verif = hashlib.md5(b'kcron').hexdigest()
     hash_verif = hashlib.md5(hashacc.encode('utf-8')).hexdigest()
-    #check if correct user
+    #check if correct user (kcron crontab only)
     if hash_cron != hash_verif:
         return "INCORRECT USER"
     else:
