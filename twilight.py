@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, session
-from NEWtwilightobs import twilightobs_select,twilightobs_insert
+from twilightobs import twilightobs_select,twilightobs_insert
 import re 
 
 app = Flask(__name__)
@@ -22,6 +22,6 @@ def twilight_insert():
 #run on port 50001
 if __name__ == '__main__':
     host = '0.0.0.0'
-    port = 50013
+    port = 50011
     debug = False
     app.run(host=host,port=port,debug=debug)
