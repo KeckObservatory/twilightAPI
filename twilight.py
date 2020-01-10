@@ -23,5 +23,5 @@ def twilight_insert():
 if __name__ == '__main__':
     host = '0.0.0.0'
     port = 50013
-    debug = True
+    debug = False
     app.run(host=host,port=port,debug=debug)
