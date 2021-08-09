@@ -218,22 +218,23 @@ def twilightobs_insert():
         allocinst = f"{proposalsapi}?cmd=getAllocInst&ktn={semester}_{projcode}"
         data = urllib.request.urlopen(allocinst)
         data = data.read().decode('utf8')
-        data = data.replace('null',"'null'")
-        if 'Usage:' in data or data == 'error':
+#        data = data.replace('null',"'null'")
+        data = json.loads(data)
+        if data['success'] == 0:
             data = None
-        institution = data
+        institution = data['data']['AllocInst']
 
     #find piid
     if semester and projcode and not piid:
         projcode = projcode.replace('ToO_','')
         #query proposals API for piid based on semester and project code
-        getpiid = f"{proposalsapi}?output=web&cmd=getPIID&ktn={semester}_{projcode}"
+        getpiid = f"{proposalsapi}?cmd=getPIID&ktn={semester}_{projcode}"
         data = urllib.request.urlopen(getpiid)
         data = data.read().decode('utf8')
-        data = data.replace('null',"'null'")
-        if 'Usage:' in data or data == 'error' or data == '0':
+        data = json.loads(data)
+        if data['success'] == 0:
             data = None
-        piid = data
+        piid = data['data']['Id']
 
     #get all supplied or calculated parameters, collect into list
     paramname = ['UTDate','StartTime','Duration','EndTime','TelNr','Instr','Semester','ProjCode','Institution','PiId','ObserverId','NightlogTicket','DelFlag','ModDate']
@@ -260,8 +261,9 @@ def twilightobs_insert():
         #create with comma
         elif p is not None and beginflag == 0:
             #add quotes if needed
-            if "'" not in p:
-                p = "'"+p+"'"
+            print(p)
+            if "'" not in str(p):
+                p = "'"+str(p)+"'"
             fields += f",{paramname[i]}"
             values += f",{p}"
     #construct insert query with specified parameters
